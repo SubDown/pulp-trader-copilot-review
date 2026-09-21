@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index,follow">
+<title>合约 SP2612.SHF · 纸浆 AI 投研工作台（公开审阅站）</title>
+<style>
+:root {
+  --bg:#f5f6f8; --card:#ffffff; --border:#e5e8ec; --text:#1a1f26; --muted:#6b7480;
+  --accent:#2563eb; --accent-soft:#eef3ff;
+  --up:#dc2626; --down:#16a34a; --warn:#d97706; --risk:#b45309;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.app{max-width:1120px;margin:0 auto;padding:0 20px 80px}
+
+/* 顶部 */
+.topbar{background:#0f172a;color:#fff;padding:0 20px;position:sticky;top:0;z-index:10;box-shadow:0 1px 8px rgba(0,0,0,.12)}
+.topbar-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;height:56px;gap:28px}
+.brand{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.brand .logo{width:22px;height:22px;border-radius:5px;background:linear-gradient(135deg,#2563eb,#16a34a);display:inline-block}
+.nav{display:flex;gap:4px;height:100%}
+.nav button{background:none;border:none;color:#cbd5e1;font-size:14px;padding:0 16px;height:100%;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;font-family:inherit}
+.nav button:hover{color:#fff}
+.nav button.active{color:#fff;border-bottom-color:#3b82f6;font-weight:600}
+
+/* 页面 */
+.page{display:none;padding-top:24px}
+.page.active{display:block}
+.page-head{margin-bottom:18px}
+.page-head h2{font-size:20px;margin:0 0 4px}
+.page-sub{color:var(--muted);font-size:13px}
+.page-sub strong{color:var(--text)}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:12px}
+.card-note{color:var(--muted);font-size:12px;margin-top:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid-2{grid-template-columns:1fr}}
+
+/* 英雄区 */
+.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:var(--radius);padding:22px 24px;margin-bottom:16px}
+.hero-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.hero-title{font-size:15px;font-weight:600;color:#dbeafe}
+.hero-code{font-size:22px;font-weight:700;color:#fff;margin-left:6px}
+.hero-date{font-size:12px;color:#bfdbfe}
+.hero-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+@media(max-width:860px){.hero-grid{grid-template-columns:repeat(3,1fr)}}
+.hero .mc{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 12px}
+.hero .mc-k{font-size:11px;color:#bfdbfe}
+.hero .mc-v{font-size:20px;font-weight:700;color:#fff}
+
+/* 指标卡 */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
+.mc{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.mc-k{font-size:11px;color:var(--muted)}
+.mc-v{font-size:17px;font-weight:700;margin-top:2px}
+.mc-sub{font-size:11px;color:var(--muted)}
+
+/* 值得关注 */
+.hl-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:#fffdf7}
+.hl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hl-cat{font-size:12px;color:var(--muted);font-weight:600}
+.hl-title{font-size:13px;font-weight:600}
+.hl-detail{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* 药丸 */
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;font-weight:600}
+.sev-warn{background:#fef3c7;color:#92400e}
+.sev-risk{background:#fee2e2;color:#991b1b}
+.sev-ok{background:#dcfce7;color:#166534}
+.pill-main{background:#dbeafe;color:#1e40af}
+.pill-second{background:#e0e7ff;color:#3730a3}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:#fafbfc;color:var(--muted);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.stale{color:var(--warn);font-weight:600}
+.ok{color:var(--down);font-weight:600}
+
+/* 图表 */
+.chart-title{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 8px}
+.legend{display:flex;gap:16px;margin:4px 0 8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend .lg{display:inline-flex;align-items:center;gap:5px}
+.legend .sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.empty{color:var(--muted);font-style:italic;font-size:13px;padding:10px 0}
+
+/* 合约选择 */
+.cc-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.cc-btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+.cc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cc-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+
+/* AI */
+.ai-intro p{font-size:13px;color:var(--muted)}
+.ai-warn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;font-size:13px;color:#92400e;margin:12px 0}
+.ai-actions{display:flex;align-items:center;gap:16px;margin-top:8px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-primary:hover{background:#1d4ed8}
+.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-secondary:hover{background:var(--accent-soft)}
+.ai-hint{font-size:12px;color:var(--muted)}
+.ai-asof{font-size:12px;color:var(--muted);font-weight:400}
+
+.ai-report{font-size:14px}
+.ai-section{margin:14px 0}
+.ai-section h4{margin:0 0 6px;font-size:14px;color:var(--text)}
+.ai-section .body{font-size:13.5px}
+.ai-badge{display:inline-block;font-size:13px;font-weight:700;padding:3px 14px;border-radius:6px;margin-bottom:10px}
+.ai-badge.bull{background:#fee2e2;color:#b91c1c}
+.ai-badge.bear{background:#dcfce7;color:#15803d}
+.ai-badge.neutral{background:#e5e7eb;color:#374151}
+.ai-badge.insufficient{background:#fef3c7;color:#92400e}
+
+.ai-followup{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.ai-follow-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ai-follow-btns button{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--text)}
+.ai-follow-btns button:hover{border-color:var(--accent);color:var(--accent)}
+.ai-input-row{display:flex;gap:10px;margin-top:10px}
+.ai-input-row input{flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;font-family:inherit}
+.ai-input-row input:focus{outline:none;border-color:var(--accent)}
+#ai-follow-result{margin-top:14px;font-size:13.5px;background:var(--bg);border-radius:8px;padding:14px}
+.ai-follow-note{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.ai-follow-note strong{color:var(--text)}
+.ai-follow-tip{color:#1e40af}
+.streaming{white-space:pre-wrap;word-break:break-word;font-size:13.5px;color:var(--text);min-height:20px}
+.streaming::after{content:'▍';color:var(--accent);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.q-item{margin-bottom:10px;padding:10px 12px;background:#eef3ff;border-radius:8px;font-size:13px}
+.a-item{font-size:13.5px;line-height:1.7}
+.a-item p{margin:6px 0}
+.a-item ul{margin:6px 0;padding-left:20px}
+
+/* 资讯 */
+.news-list{margin-top:4px}
+.news-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.news-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.news-time{font-size:12px;color:var(--muted);font-weight:600}
+.news-src{font-size:11px;color:var(--muted)}
+.news-title{font-size:13.5px;font-weight:600;margin-bottom:4px}
+.news-title a{color:var(--text);text-decoration:none}
+.news-title a:hover{color:var(--accent)}
+.news-summary{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.news-rel{font-size:12px;color:#92400e;background:#fffbeb;border-radius:6px;padding:6px 10px;margin-top:6px}
+
+/* 重要度药丸 */
+.imp-high{background:#fee2e2;color:#b91c1c}
+.imp-mid{background:#fef3c7;color:#92400e}
+.imp-low{background:#e5e7eb;color:#374151}
+
+/* 事件表 */
+.ev-impact{font-size:12px;color:var(--muted);max-width:260px}
+
+/* 报告样式 */
+.rep-h2{font-size:17px;margin:16px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.rep-h3{font-size:15px;margin:16px 0 8px;color:var(--text)}
+.rep-h4{font-size:13.5px;margin:12px 0 6px;color:var(--muted)}
+.rep-p{font-size:13.5px;margin:6px 0;line-height:1.7}
+.rep-ul{margin:6px 0;padding-left:20px;font-size:13.5px;line-height:1.7}
+.rep-quote{background:var(--bg);border-left:3px solid var(--accent);padding:8px 14px;margin:10px 0;color:var(--muted);font-size:12.5px;border-radius:0 6px 6px 0}
+.rep-hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* 历史分析 */
+.hist-item{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;cursor:pointer}
+.hist-head{display:flex;gap:16px;padding:10px 14px;background:#fafbfc;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.hist-head span:first-child{font-weight:600;color:var(--text)}
+.hist-body{padding:14px;border-top:1px solid var(--border)}
+
+.footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
+
+/* 顶栏登录区 */
+.auth-zone{margin-left:auto;display:flex;align-items:center;gap:10px}
+.auth-user{color:#cbd5e1;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-btn{background:none;border:1px solid #475569;color:#e2e8f0;border-radius:6px;padding:5px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+.auth-btn:hover{border-color:#94a3b8;color:#fff}
+.auth-btn.primary{background:#2563eb;border-color:#2563eb;color:#fff}
+
+/* AI 登录门控卡片 */
+.ai-gate p{font-size:13px;color:var(--muted)}
+
+/* 登录/注册弹层 */
+.auth-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center}
+.auth-modal-mask{position:absolute;inset:0;background:rgba(15,23,42,.5)}
+.auth-dialog{position:relative;background:#fff;border-radius:12px;width:380px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden}
+.auth-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.auth-title{font-size:16px;font-weight:700}
+.auth-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border)}
+.auth-tab{flex:1;background:none;border:none;padding:12px;font-size:14px;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:2px solid transparent}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.auth-body{padding:18px 20px 20px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.auth-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;box-sizing:border-box}
+.auth-field input:focus{outline:none;border-color:var(--accent)}
+.auth-otp-row{display:flex;gap:8px}
+.auth-otp-row input{flex:1}
+.auth-otp-row button{white-space:nowrap;padding:10px 12px}
+.auth-error{background:#fee2e2;color:#991b1b;border-radius:6px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.auth-submit{width:100%;margin-top:4px}
+.auth-links{display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px}
+.auth-links a{color:var(--accent);text-decoration:none;cursor:pointer}
+.auth-links a:hover{text-decoration:underline}
+
+/* Review Site 覆盖：页面直接显示，不靠 JS 切换 */
+.page{display:block !important;padding-top:24px}
+/* Review 导航：纯 <a> 链接，无需 JS */
+.review-nav{display:flex;gap:4px;height:100%}
+.review-nav a{color:#cbd5e1;font-size:14px;padding:0 16px;height:100%;display:flex;align-items:center;text-decoration:none;border-bottom:2px solid transparent;transition:.15s}
+.review-nav a:hover{color:#fff}
+.review-nav a.active{color:#fff;border-bottom-color:#3b82f6;font-weight:600}
+.review-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#92400e;margin-bottom:16px}
+.review-banner a{color:#92400e;font-weight:600}
+.review-breadcrumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.review-breadcrumb a{color:var(--accent);text-decoration:none}
+.review-breadcrumb a:hover{text-decoration:underline}
+.conv-msg{margin-bottom:12px}
+.conv-q{padding:10px 14px;background:#eef3ff;border-radius:8px;font-size:13.5px;font-weight:600}
+.conv-a{margin-top:6px;padding:12px 14px;background:#fafbfc;border:1px solid var(--border);border-radius:8px;font-size:13.5px;line-height:1.7}
+.conv-a p{margin:6px 0}
+.conv-a ul{margin:6px 0;padding-left:20px}
+.conv-meta{font-size:11.5px;color:var(--muted);margin-top:4px}
+.sample-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sample-meta .sm{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)}
+.sample-meta .sm strong{color:var(--text)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="logo"></span>纸浆 AI 投研工作台 · 公开审阅站</div>
+    <div class="review-nav">
+      <a href="/">纸浆市场看板</a>
+      <a href="/futures/" class="active">期货行情</a>
+      <a href="/ai/">AI 品种分析</a>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  
+<div class="review-banner">
+  这是<strong>公开审阅站</strong>（供外部工具抓取审阅用），非正式产品入口。正式站见
+  <a href="https://pulp-trader-copilot.app.workbuddy.host/" target="_blank" rel="noopener">pulp-trader-copilot.app.workbuddy.host</a>。
+  本页所有内容已预渲染到 HTML，无需执行 JavaScript 即可阅读；数据截至 2026-09-16。
+</div>
+
+  <div class="review-breadcrumb"><a href="/futures/">期货行情</a> / SP2612.SHF（交割月 2026-12，最后交易日 2026-12-15）</div>
+  
+<div class="page" id="page-futures-detail">
+  <div class="page-head">
+    <h2>SP2612.SHF（交割月 2026-12）</h2>
+    <div class="page-sub">最后交易日 2026-12-15 · 数据截至 <strong>2026-09-16</strong></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">合约行情</div>
+    <div class="metric-grid"><div class="mc"><div class="mc-k">收盘价</div><div class="mc-v" style="color:#dc2626">4,830</div></div><div class="mc"><div class="mc-k">涨跌</div><div class="mc-v" style="color:#dc2626">+40</div><div class="mc-sub">+0.84%</div></div><div class="mc"><div class="mc-k">结算价</div><div class="mc-v">4,832</div></div><div class="mc"><div class="mc-k">成交量</div><div class="mc-v">558</div><div class="mc-sub">手</div></div><div class="mc"><div class="mc-k">持仓量</div><div class="mc-v">3,528</div><div class="mc-sub">手</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="chart-title">日K线（近 120 交易日，涨红跌绿）</div>
+    <svg viewBox="0 0 640 220" width="100%" style="display:block"><line x1="46" y1="194" x2="628" y2="194" stroke="#d8dce2" stroke-width="1"/><line x1="46" y1="194.0" x2="628" y2="194.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="149.0" x2="628" y2="149.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="104.0" x2="628" y2="104.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="59.0" x2="628" y2="59.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="14.0" x2="628" y2="14.0" stroke="#eef0f3" stroke-width="1"/><text x="40" y="194.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">4,559</text><text x="40" y="149.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">4,760</text><text x="40" y="104.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">4,960</text><text x="40" y="59.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">5,160</text><text x="40" y="14.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">5,361</text><text x="46.0" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-03-26</text><text x="143.8" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-04-24</text><text x="241.6" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-05-27</text><text x="339.4" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-06-25</text><text x="437.3" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-07-23</text><text x="535.1" y="208" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-08-20</text><line x1="46.0" y1="20.9" x2="46.0" y2="32.6" stroke="#16a34a" stroke-width="0.8"/><rect x="44.8" y="20.9" width="2.4" height="11.7" fill="#16a34a" rx="0.5"/><line x1="50.9" y1="27.2" x2="50.9" y2="27.7" stroke="#16a34a" stroke-width="0.8"/><rect x="49.7" y="27.2" width="2.4" height="1.0" fill="#16a34a" rx="0.5"/><line x1="55.8" y1="23.6" x2="55.8" y2="23.6" stroke="#dc2626" stroke-width="0.8"/><rect x="54.6" y="23.6" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="60.7" y1="34.9" x2="60.7" y2="36.2" stroke="#16a34a" stroke-width="0.8"/><rect x="59.5" y="34.9" width="2.4" height="1.3" fill="#16a34a" rx="0.5"/><line x1="65.6" y1="31.7" x2="65.6" y2="46.5" stroke="#16a34a" stroke-width="0.8"/><rect x="64.4" y="40.7" width="2.4" height="5.4" fill="#16a34a" rx="0.5"/><line x1="70.5" y1="40.7" x2="70.5" y2="49.7" stroke="#16a34a" stroke-width="0.8"/><rect x="69.2" y="44.7" width="2.4" height="4.9" fill="#16a34a" rx="0.5"/><line x1="75.3" y1="44.3" x2="75.3" y2="51.5" stroke="#dc2626" stroke-width="0.8"/><rect x="74.1" y="44.3" width="2.4" height="7.2" fill="#dc2626" rx="0.5"/><line x1="80.2" y1="54.6" x2="80.2" y2="57.3" stroke="#16a34a" stroke-width="0.8"/><rect x="79.0" y="54.6" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="85.1" y1="51.9" x2="85.1" y2="67.6" stroke="#dc2626" stroke-width="0.8"/><rect x="83.9" y="51.9" width="2.4" height="7.6" fill="#dc2626" rx="0.5"/><line x1="90.0" y1="50.6" x2="90.0" y2="57.3" stroke="#16a34a" stroke-width="0.8"/><rect x="88.8" y="51.0" width="2.4" height="6.3" fill="#16a34a" rx="0.5"/><line x1="94.9" y1="59.6" x2="94.9" y2="61.4" stroke="#16a34a" stroke-width="0.8"/><rect x="93.7" y="59.6" width="2.4" height="1.3" fill="#16a34a" rx="0.5"/><line x1="99.8" y1="60.9" x2="99.8" y2="78.0" stroke="#16a34a" stroke-width="0.8"/><rect x="98.6" y="61.8" width="2.4" height="9.4" fill="#16a34a" rx="0.5"/><line x1="104.7" y1="69.0" x2="104.7" y2="69.9" stroke="#dc2626" stroke-width="0.8"/><rect x="103.5" y="69.4" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="109.6" y1="74.8" x2="109.6" y2="82.9" stroke="#16a34a" stroke-width="0.8"/><rect x="108.4" y="74.8" width="2.4" height="4.0" fill="#16a34a" rx="0.5"/><line x1="114.5" y1="74.8" x2="114.5" y2="82.9" stroke="#dc2626" stroke-width="0.8"/><rect x="113.3" y="74.8" width="2.4" height="1.3" fill="#dc2626" rx="0.5"/><line x1="119.4" y1="66.3" x2="119.4" y2="73.5" stroke="#dc2626" stroke-width="0.8"/><rect x="118.1" y="66.3" width="2.4" height="7.2" fill="#dc2626" rx="0.5"/><line x1="124.3" y1="52.8" x2="124.3" y2="67.6" stroke="#dc2626" stroke-width="0.8"/><rect x="123.0" y="52.8" width="2.4" height="14.8" fill="#dc2626" rx="0.5"/><line x1="129.1" y1="48.8" x2="129.1" y2="65.4" stroke="#16a34a" stroke-width="0.8"/><rect x="127.9" y="49.7" width="2.4" height="7.6" fill="#16a34a" rx="0.5"/><line x1="134.0" y1="49.7" x2="134.0" y2="57.3" stroke="#dc2626" stroke-width="0.8"/><rect x="132.8" y="55.1" width="2.4" height="1.8" fill="#dc2626" rx="0.5"/><line x1="138.9" y1="50.1" x2="138.9" y2="60.9" stroke="#16a34a" stroke-width="0.8"/><rect x="137.7" y="52.8" width="2.4" height="8.1" fill="#16a34a" rx="0.5"/><line x1="143.8" y1="60.0" x2="143.8" y2="72.1" stroke="#16a34a" stroke-width="0.8"/><rect x="142.6" y="62.7" width="2.4" height="9.4" fill="#16a34a" rx="0.5"/><line x1="148.7" y1="63.6" x2="148.7" y2="70.3" stroke="#dc2626" stroke-width="0.8"/><rect x="147.5" y="64.5" width="2.4" height="4.9" fill="#dc2626" rx="0.5"/><line x1="153.6" y1="69.0" x2="153.6" y2="77.1" stroke="#16a34a" stroke-width="0.8"/><rect x="152.4" y="69.0" width="2.4" height="3.1" fill="#16a34a" rx="0.5"/><line x1="158.5" y1="73.5" x2="158.5" y2="80.2" stroke="#dc2626" stroke-width="0.8"/><rect x="157.3" y="73.5" width="2.4" height="4.5" fill="#dc2626" rx="0.5"/><line x1="163.4" y1="66.7" x2="163.4" y2="74.8" stroke="#16a34a" stroke-width="0.8"/><rect x="162.2" y="67.2" width="2.4" height="4.9" fill="#16a34a" rx="0.5"/><line x1="168.3" y1="59.1" x2="168.3" y2="64.5" stroke="#dc2626" stroke-width="0.8"/><rect x="167.1" y="62.3" width="2.4" height="2.2" fill="#dc2626" rx="0.5"/><line x1="173.2" y1="64.0" x2="173.2" y2="72.6" stroke="#16a34a" stroke-width="0.8"/><rect x="171.9" y="65.8" width="2.4" height="3.6" fill="#16a34a" rx="0.5"/><line x1="178.1" y1="55.1" x2="178.1" y2="69.0" stroke="#16a34a" stroke-width="0.8"/><rect x="176.8" y="64.5" width="2.4" height="4.5" fill="#16a34a" rx="0.5"/><line x1="182.9" y1="53.3" x2="182.9" y2="65.8" stroke="#dc2626" stroke-width="0.8"/><rect x="181.7" y="56.9" width="2.4" height="8.5" fill="#dc2626" rx="0.5"/><line x1="187.8" y1="51.0" x2="187.8" y2="61.8" stroke="#16a34a" stroke-width="0.8"/><rect x="186.6" y="56.9" width="2.4" height="1.0" fill="#16a34a" rx="0.5"/><line x1="192.7" y1="50.1" x2="192.7" y2="60.0" stroke="#dc2626" stroke-width="0.8"/><rect x="191.5" y="50.1" width="2.4" height="6.7" fill="#dc2626" rx="0.5"/><line x1="197.6" y1="47.0" x2="197.6" y2="67.2" stroke="#16a34a" stroke-width="0.8"/><rect x="196.4" y="50.6" width="2.4" height="9.9" fill="#16a34a" rx="0.5"/><line x1="202.5" y1="59.1" x2="202.5" y2="72.6" stroke="#16a34a" stroke-width="0.8"/><rect x="201.3" y="61.8" width="2.4" height="10.8" fill="#16a34a" rx="0.5"/><line x1="207.4" y1="73.9" x2="207.4" y2="80.2" stroke="#16a34a" stroke-width="0.8"/><rect x="206.2" y="73.9" width="2.4" height="2.2" fill="#16a34a" rx="0.5"/><line x1="212.3" y1="71.2" x2="212.3" y2="78.9" stroke="#dc2626" stroke-width="0.8"/><rect x="211.1" y="73.9" width="2.4" height="2.7" fill="#dc2626" rx="0.5"/><line x1="217.2" y1="71.2" x2="217.2" y2="85.1" stroke="#16a34a" stroke-width="0.8"/><rect x="216.0" y="71.2" width="2.4" height="13.5" fill="#16a34a" rx="0.5"/><line x1="222.1" y1="82.0" x2="222.1" y2="98.6" stroke="#16a34a" stroke-width="0.8"/><rect x="220.9" y="87.8" width="2.4" height="10.3" fill="#16a34a" rx="0.5"/><line x1="227.0" y1="98.6" x2="227.0" y2="105.3" stroke="#16a34a" stroke-width="0.8"/><rect x="225.7" y="101.8" width="2.4" height="1.0" fill="#16a34a" rx="0.5"/><line x1="231.8" y1="88.3" x2="231.8" y2="104.4" stroke="#dc2626" stroke-width="0.8"/><rect x="230.6" y="91.0" width="2.4" height="11.2" fill="#dc2626" rx="0.5"/><line x1="236.7" y1="88.3" x2="236.7" y2="94.1" stroke="#16a34a" stroke-width="0.8"/><rect x="235.5" y="88.3" width="2.4" height="4.0" fill="#16a34a" rx="0.5"/><line x1="241.6" y1="87.8" x2="241.6" y2="94.6" stroke="#16a34a" stroke-width="0.8"/><rect x="240.4" y="89.2" width="2.4" height="3.1" fill="#16a34a" rx="0.5"/><line x1="246.5" y1="91.9" x2="246.5" y2="102.2" stroke="#16a34a" stroke-width="0.8"/><rect x="245.3" y="91.9" width="2.4" height="3.1" fill="#16a34a" rx="0.5"/><line x1="251.4" y1="101.8" x2="251.4" y2="109.4" stroke="#16a34a" stroke-width="0.8"/><rect x="250.2" y="101.8" width="2.4" height="6.7" fill="#16a34a" rx="0.5"/><line x1="256.3" y1="108.5" x2="256.3" y2="117.0" stroke="#16a34a" stroke-width="0.8"/><rect x="255.1" y="112.5" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="261.2" y1="114.8" x2="261.2" y2="124.2" stroke="#16a34a" stroke-width="0.8"/><rect x="260.0" y="115.2" width="2.4" height="7.6" fill="#16a34a" rx="0.5"/><line x1="266.1" y1="115.2" x2="266.1" y2="124.7" stroke="#16a34a" stroke-width="0.8"/><rect x="264.9" y="120.2" width="2.4" height="3.6" fill="#16a34a" rx="0.5"/><line x1="271.0" y1="122.4" x2="271.0" y2="135.0" stroke="#16a34a" stroke-width="0.8"/><rect x="269.8" y="123.3" width="2.4" height="9.0" fill="#16a34a" rx="0.5"/><line x1="275.9" y1="120.2" x2="275.9" y2="139.9" stroke="#dc2626" stroke-width="0.8"/><rect x="274.7" y="122.0" width="2.4" height="12.1" fill="#dc2626" rx="0.5"/><line x1="280.8" y1="117.5" x2="280.8" y2="130.9" stroke="#16a34a" stroke-width="0.8"/><rect x="279.5" y="117.9" width="2.4" height="8.5" fill="#16a34a" rx="0.5"/><line x1="285.6" y1="116.6" x2="285.6" y2="129.6" stroke="#dc2626" stroke-width="0.8"/><rect x="284.4" y="116.6" width="2.4" height="4.9" fill="#dc2626" rx="0.5"/><line x1="290.5" y1="112.5" x2="290.5" y2="120.2" stroke="#dc2626" stroke-width="0.8"/><rect x="289.3" y="119.3" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="295.4" y1="112.5" x2="295.4" y2="124.7" stroke="#dc2626" stroke-width="0.8"/><rect x="294.2" y="113.4" width="2.4" height="8.5" fill="#dc2626" rx="0.5"/><line x1="300.3" y1="111.6" x2="300.3" y2="120.2" stroke="#16a34a" stroke-width="0.8"/><rect x="299.1" y="114.3" width="2.4" height="1.3" fill="#16a34a" rx="0.5"/><line x1="305.2" y1="105.3" x2="305.2" y2="113.9" stroke="#dc2626" stroke-width="0.8"/><rect x="304.0" y="108.9" width="2.4" height="4.9" fill="#dc2626" rx="0.5"/><line x1="310.1" y1="102.2" x2="310.1" y2="116.6" stroke="#dc2626" stroke-width="0.8"/><rect x="308.9" y="103.1" width="2.4" height="7.2" fill="#dc2626" rx="0.5"/><line x1="315.0" y1="101.8" x2="315.0" y2="105.3" stroke="#16a34a" stroke-width="0.8"/><rect x="313.8" y="101.8" width="2.4" height="2.2" fill="#16a34a" rx="0.5"/><line x1="319.9" y1="100.0" x2="319.9" y2="120.6" stroke="#16a34a" stroke-width="0.8"/><rect x="318.7" y="101.8" width="2.4" height="17.1" fill="#16a34a" rx="0.5"/><line x1="324.8" y1="112.5" x2="324.8" y2="128.7" stroke="#16a34a" stroke-width="0.8"/><rect x="323.6" y="112.5" width="2.4" height="16.2" fill="#16a34a" rx="0.5"/><line x1="329.7" y1="130.9" x2="329.7" y2="148.0" stroke="#16a34a" stroke-width="0.8"/><rect x="328.5" y="130.9" width="2.4" height="16.2" fill="#16a34a" rx="0.5"/><line x1="334.6" y1="146.6" x2="334.6" y2="153.8" stroke="#16a34a" stroke-width="0.8"/><rect x="333.3" y="148.9" width="2.4" height="4.0" fill="#16a34a" rx="0.5"/><line x1="339.4" y1="156.1" x2="339.4" y2="166.8" stroke="#16a34a" stroke-width="0.8"/><rect x="338.2" y="156.1" width="2.4" height="8.5" fill="#16a34a" rx="0.5"/><line x1="344.3" y1="156.1" x2="344.3" y2="167.3" stroke="#16a34a" stroke-width="0.8"/><rect x="343.1" y="161.9" width="2.4" height="5.4" fill="#16a34a" rx="0.5"/><line x1="349.2" y1="153.4" x2="349.2" y2="170.0" stroke="#dc2626" stroke-width="0.8"/><rect x="348.0" y="153.4" width="2.4" height="14.4" fill="#dc2626" rx="0.5"/><line x1="354.1" y1="147.1" x2="354.1" y2="155.6" stroke="#16a34a" stroke-width="0.8"/><rect x="352.9" y="151.1" width="2.4" height="4.5" fill="#16a34a" rx="0.5"/><line x1="359.0" y1="139.5" x2="359.0" y2="153.4" stroke="#dc2626" stroke-width="0.8"/><rect x="357.8" y="145.7" width="2.4" height="5.4" fill="#dc2626" rx="0.5"/><line x1="363.9" y1="138.1" x2="363.9" y2="144.9" stroke="#16a34a" stroke-width="0.8"/><rect x="362.7" y="138.6" width="2.4" height="6.3" fill="#16a34a" rx="0.5"/><line x1="368.8" y1="137.7" x2="368.8" y2="147.5" stroke="#dc2626" stroke-width="0.8"/><rect x="367.6" y="142.2" width="2.4" height="5.4" fill="#dc2626" rx="0.5"/><line x1="373.7" y1="140.4" x2="373.7" y2="153.4" stroke="#16a34a" stroke-width="0.8"/><rect x="372.5" y="140.4" width="2.4" height="13.0" fill="#16a34a" rx="0.5"/><line x1="378.6" y1="148.4" x2="378.6" y2="161.5" stroke="#dc2626" stroke-width="0.8"/><rect x="377.4" y="154.3" width="2.4" height="7.2" fill="#dc2626" rx="0.5"/><line x1="383.5" y1="152.0" x2="383.5" y2="161.5" stroke="#16a34a" stroke-width="0.8"/><rect x="382.2" y="157.9" width="2.4" height="3.6" fill="#16a34a" rx="0.5"/><line x1="388.4" y1="144.4" x2="388.4" y2="164.2" stroke="#dc2626" stroke-width="0.8"/><rect x="387.1" y="144.4" width="2.4" height="17.5" fill="#dc2626" rx="0.5"/><line x1="393.2" y1="122.4" x2="393.2" y2="146.2" stroke="#dc2626" stroke-width="0.8"/><rect x="392.0" y="126.0" width="2.4" height="20.2" fill="#dc2626" rx="0.5"/><line x1="398.1" y1="115.7" x2="398.1" y2="125.5" stroke="#16a34a" stroke-width="0.8"/><rect x="396.9" y="121.1" width="2.4" height="1.0" fill="#16a34a" rx="0.5"/><line x1="403.0" y1="124.7" x2="403.0" y2="134.1" stroke="#dc2626" stroke-width="0.8"/><rect x="401.8" y="124.7" width="2.4" height="1.8" fill="#dc2626" rx="0.5"/><line x1="407.9" y1="108.9" x2="407.9" y2="130.9" stroke="#dc2626" stroke-width="0.8"/><rect x="406.7" y="119.7" width="2.4" height="8.5" fill="#dc2626" rx="0.5"/><line x1="412.8" y1="122.0" x2="412.8" y2="131.8" stroke="#16a34a" stroke-width="0.8"/><rect x="411.6" y="122.0" width="2.4" height="9.4" fill="#16a34a" rx="0.5"/><line x1="417.7" y1="128.2" x2="417.7" y2="145.3" stroke="#16a34a" stroke-width="0.8"/><rect x="416.5" y="130.5" width="2.4" height="14.8" fill="#16a34a" rx="0.5"/><line x1="422.6" y1="117.9" x2="422.6" y2="144.0" stroke="#dc2626" stroke-width="0.8"/><rect x="421.4" y="124.7" width="2.4" height="19.3" fill="#dc2626" rx="0.5"/><line x1="427.5" y1="115.7" x2="427.5" y2="123.3" stroke="#dc2626" stroke-width="0.8"/><rect x="426.3" y="118.8" width="2.4" height="3.1" fill="#dc2626" rx="0.5"/><line x1="432.4" y1="122.0" x2="432.4" y2="132.7" stroke="#16a34a" stroke-width="0.8"/><rect x="431.2" y="122.0" width="2.4" height="4.0" fill="#16a34a" rx="0.5"/><line x1="437.3" y1="108.9" x2="437.3" y2="125.1" stroke="#dc2626" stroke-width="0.8"/><rect x="436.0" y="118.8" width="2.4" height="3.1" fill="#dc2626" rx="0.5"/><line x1="442.2" y1="120.2" x2="442.2" y2="132.7" stroke="#16a34a" stroke-width="0.8"/><rect x="440.9" y="120.6" width="2.4" height="8.1" fill="#16a34a" rx="0.5"/><line x1="447.0" y1="125.1" x2="447.0" y2="131.8" stroke="#dc2626" stroke-width="0.8"/><rect x="445.8" y="130.0" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="451.9" y1="130.5" x2="451.9" y2="140.8" stroke="#16a34a" stroke-width="0.8"/><rect x="450.7" y="132.3" width="2.4" height="7.6" fill="#16a34a" rx="0.5"/><line x1="456.8" y1="130.0" x2="456.8" y2="140.8" stroke="#dc2626" stroke-width="0.8"/><rect x="455.6" y="135.9" width="2.4" height="3.6" fill="#dc2626" rx="0.5"/><line x1="461.7" y1="130.9" x2="461.7" y2="148.4" stroke="#16a34a" stroke-width="0.8"/><rect x="460.5" y="132.7" width="2.4" height="13.9" fill="#16a34a" rx="0.5"/><line x1="466.6" y1="148.4" x2="466.6" y2="160.1" stroke="#16a34a" stroke-width="0.8"/><rect x="465.4" y="148.9" width="2.4" height="9.9" fill="#16a34a" rx="0.5"/><line x1="471.5" y1="153.4" x2="471.5" y2="161.0" stroke="#16a34a" stroke-width="0.8"/><rect x="470.3" y="158.8" width="2.4" height="1.8" fill="#16a34a" rx="0.5"/><line x1="476.4" y1="156.5" x2="476.4" y2="165.1" stroke="#dc2626" stroke-width="0.8"/><rect x="475.2" y="161.9" width="2.4" height="1.3" fill="#dc2626" rx="0.5"/><line x1="481.3" y1="158.3" x2="481.3" y2="166.4" stroke="#dc2626" stroke-width="0.8"/><rect x="480.1" y="161.5" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="486.2" y1="157.9" x2="486.2" y2="163.3" stroke="#dc2626" stroke-width="0.8"/><rect x="485.0" y="161.9" width="2.4" height="1.3" fill="#dc2626" rx="0.5"/><line x1="491.1" y1="164.6" x2="491.1" y2="176.3" stroke="#16a34a" stroke-width="0.8"/><rect x="489.8" y="165.1" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="495.9" y1="163.3" x2="495.9" y2="170.9" stroke="#16a34a" stroke-width="0.8"/><rect x="494.7" y="165.1" width="2.4" height="5.4" fill="#16a34a" rx="0.5"/><line x1="500.8" y1="171.3" x2="500.8" y2="184.4" stroke="#16a34a" stroke-width="0.8"/><rect x="499.6" y="171.3" width="2.4" height="13.0" fill="#16a34a" rx="0.5"/><line x1="505.7" y1="166.8" x2="505.7" y2="187.5" stroke="#dc2626" stroke-width="0.8"/><rect x="504.5" y="168.2" width="2.4" height="15.7" fill="#dc2626" rx="0.5"/><line x1="510.6" y1="158.3" x2="510.6" y2="172.2" stroke="#dc2626" stroke-width="0.8"/><rect x="509.4" y="160.6" width="2.4" height="5.8" fill="#dc2626" rx="0.5"/><line x1="515.5" y1="149.8" x2="515.5" y2="166.8" stroke="#16a34a" stroke-width="0.8"/><rect x="514.3" y="158.3" width="2.4" height="5.4" fill="#16a34a" rx="0.5"/><line x1="520.4" y1="151.1" x2="520.4" y2="165.5" stroke="#dc2626" stroke-width="0.8"/><rect x="519.2" y="154.7" width="2.4" height="7.6" fill="#dc2626" rx="0.5"/><line x1="525.3" y1="152.5" x2="525.3" y2="158.3" stroke="#dc2626" stroke-width="0.8"/><rect x="524.1" y="153.8" width="2.4" height="1.0" fill="#dc2626" rx="0.5"/><line x1="530.2" y1="149.8" x2="530.2" y2="164.6" stroke="#16a34a" stroke-width="0.8"/><rect x="529.0" y="150.7" width="2.4" height="7.2" fill="#16a34a" rx="0.5"/><line x1="535.1" y1="137.7" x2="535.1" y2="159.7" stroke="#dc2626" stroke-width="0.8"/><rect x="533.9" y="137.7" width="2.4" height="16.6" fill="#dc2626" rx="0.5"/><line x1="540.0" y1="116.6" x2="540.0" y2="138.6" stroke="#dc2626" stroke-width="0.8"/><rect x="538.8" y="117.9" width="2.4" height="20.7" fill="#dc2626" rx="0.5"/><line x1="544.9" y1="113.4" x2="544.9" y2="123.8" stroke="#16a34a" stroke-width="0.8"/><rect x="543.6" y="116.1" width="2.4" height="6.3" fill="#16a34a" rx="0.5"/><line x1="549.7" y1="121.1" x2="549.7" y2="131.8" stroke="#16a34a" stroke-width="0.8"/><rect x="548.5" y="122.4" width="2.4" height="3.1" fill="#16a34a" rx="0.5"/><line x1="554.6" y1="126.4" x2="554.6" y2="140.8" stroke="#16a34a" stroke-width="0.8"/><rect x="553.4" y="128.2" width="2.4" height="10.3" fill="#16a34a" rx="0.5"/><line x1="559.5" y1="129.6" x2="559.5" y2="143.1" stroke="#dc2626" stroke-width="0.8"/><rect x="558.3" y="134.5" width="2.4" height="4.5" fill="#dc2626" rx="0.5"/><line x1="564.4" y1="135.9" x2="564.4" y2="152.9" stroke="#16a34a" stroke-width="0.8"/><rect x="563.2" y="135.9" width="2.4" height="4.0" fill="#16a34a" rx="0.5"/><line x1="569.3" y1="131.4" x2="569.3" y2="147.5" stroke="#16a34a" stroke-width="0.8"/><rect x="568.1" y="139.9" width="2.4" height="6.7" fill="#16a34a" rx="0.5"/><line x1="574.2" y1="124.2" x2="574.2" y2="152.9" stroke="#dc2626" stroke-width="0.8"/><rect x="573.0" y="124.2" width="2.4" height="24.2" fill="#dc2626" rx="0.5"/><line x1="579.1" y1="120.6" x2="579.1" y2="135.4" stroke="#16a34a" stroke-width="0.8"/><rect x="577.9" y="124.7" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="584.0" y1="122.9" x2="584.0" y2="137.7" stroke="#16a34a" stroke-width="0.8"/><rect x="582.8" y="128.7" width="2.4" height="3.6" fill="#16a34a" rx="0.5"/><line x1="588.9" y1="119.3" x2="588.9" y2="139.9" stroke="#dc2626" stroke-width="0.8"/><rect x="587.7" y="124.2" width="2.4" height="9.4" fill="#dc2626" rx="0.5"/><line x1="593.8" y1="118.4" x2="593.8" y2="132.7" stroke="#16a34a" stroke-width="0.8"/><rect x="592.6" y="122.0" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="598.7" y1="119.3" x2="598.7" y2="132.7" stroke="#dc2626" stroke-width="0.8"/><rect x="597.4" y="121.1" width="2.4" height="7.2" fill="#dc2626" rx="0.5"/><line x1="603.5" y1="108.9" x2="603.5" y2="130.9" stroke="#16a34a" stroke-width="0.8"/><rect x="602.3" y="117.9" width="2.4" height="7.6" fill="#16a34a" rx="0.5"/><line x1="608.4" y1="125.5" x2="608.4" y2="139.0" stroke="#16a34a" stroke-width="0.8"/><rect x="607.2" y="126.0" width="2.4" height="12.6" fill="#16a34a" rx="0.5"/><line x1="613.3" y1="127.8" x2="613.3" y2="144.4" stroke="#16a34a" stroke-width="0.8"/><rect x="612.1" y="136.3" width="2.4" height="2.7" fill="#16a34a" rx="0.5"/><line x1="618.2" y1="130.9" x2="618.2" y2="147.5" stroke="#16a34a" stroke-width="0.8"/><rect x="617.0" y="135.4" width="2.4" height="8.1" fill="#16a34a" rx="0.5"/><line x1="623.1" y1="142.2" x2="623.1" y2="155.6" stroke="#dc2626" stroke-width="0.8"/><rect x="621.9" y="142.2" width="2.4" height="2.2" fill="#dc2626" rx="0.5"/><line x1="628.0" y1="127.8" x2="628.0" y2="143.5" stroke="#dc2626" stroke-width="0.8"/><rect x="626.8" y="133.2" width="2.4" height="10.3" fill="#dc2626" rx="0.5"/><polyline points="46.0,32.6 50.9,27.7 55.8,23.6 60.7,36.2 65.6,46.1 70.5,49.7 75.3,44.3 80.2,57.3 85.1,51.9 90.0,57.3 94.9,60.9 99.8,71.2 104.7,69.4 109.6,78.9 114.5,74.8 119.4,66.3 124.3,52.8 129.1,57.3 134.0,55.1 138.9,60.9 143.8,72.1 148.7,64.5 153.6,72.1 158.5,73.5 163.4,72.1 168.3,62.3 173.2,69.4 178.1,69.0 182.9,56.9 187.8,57.8 192.7,50.1 197.6,60.5 202.5,72.6 207.4,76.2 212.3,73.9 217.2,84.7 222.1,98.2 227.0,102.7 231.8,91.0 236.7,92.3 241.6,92.3 246.5,95.0 251.4,108.5 256.3,115.2 261.2,122.9 266.1,123.8 271.0,132.3 275.9,122.0 280.8,126.4 285.6,116.6 290.5,119.3 295.4,113.4 300.3,115.7 305.2,108.9 310.1,103.1 315.0,104.0 319.9,118.8 324.8,128.7 329.7,147.1 334.6,152.9 339.4,164.6 344.3,167.3 349.2,153.4 354.1,155.6 359.0,145.7 363.9,144.9 368.8,142.2 373.7,153.4 378.6,154.3 383.5,161.5 388.4,144.4 393.2,126.0 398.1,122.0 403.0,124.7 407.9,119.7 412.8,131.4 417.7,145.3 422.6,124.7 427.5,118.8 432.4,126.0 437.3,118.8 442.2,128.7 447.0,130.0 451.9,139.9 456.8,135.9 461.7,146.6 466.6,158.8 471.5,160.6 476.4,161.9 481.3,161.5 486.2,161.9 491.1,167.7 495.9,170.4 500.8,184.4 505.7,168.2 510.6,160.6 515.5,163.7 520.4,154.7 525.3,153.8 530.2,157.9 535.1,137.7 540.0,117.9 544.9,122.4 549.7,125.5 554.6,138.6 559.5,134.5 564.4,139.9 569.3,146.6 574.2,124.2 579.1,127.3 584.0,132.3 588.9,124.2 593.8,124.7 598.7,121.1 603.5,125.5 608.4,138.6 613.3,139.0 618.2,143.5 623.1,142.2 628.0,133.2" fill="none" stroke="#2563eb" stroke-width="1.4"/></svg>
+  </div>
+
+  <div class="card">
+    <div class="chart-title">成交量 / 持仓量</div>
+    <div class="legend"><span class="lg"><i class="sw" style="background:#dbeafe"></i>成交量</span><span class="lg"><i class="sw" style="background:#16a34a"></i>持仓量</span></div><svg viewBox="0 0 640 180" width="100%" style="display:block"><line x1="46" y1="154" x2="628" y2="154" stroke="#d8dce2" stroke-width="1"/><line x1="46" y1="154.0" x2="628" y2="154.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="119.0" x2="628" y2="119.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="84.0" x2="628" y2="84.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="49.0" x2="628" y2="49.0" stroke="#eef0f3" stroke-width="1"/><line x1="46" y1="14.0" x2="628" y2="14.0" stroke="#eef0f3" stroke-width="1"/><text x="40" y="154.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">0</text><text x="40" y="119.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">1,074</text><text x="40" y="84.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">2,147</text><text x="40" y="49.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">3,221</text><text x="40" y="14.0" text-anchor="end" font-size="9" fill="#9aa1ab" dominant-baseline="middle">4,294</text><text x="46.0" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-03-26</text><text x="143.8" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-04-24</text><text x="241.6" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-05-27</text><text x="339.4" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-06-25</text><text x="437.3" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-07-23</text><text x="535.1" y="168" text-anchor="middle" font-size="8.5" fill="#9aa1ab">2026-08-20</text><rect x="44.8" y="153.5" width="2.4" height="0.5" fill="#dbeafe"/><rect x="49.7" y="153.9" width="2.4" height="0.1" fill="#dbeafe"/><rect x="54.6" y="153.9" width="2.4" height="0.1" fill="#dbeafe"/><rect x="59.5" y="153.9" width="2.4" height="0.1" fill="#dbeafe"/><rect x="64.4" y="153.4" width="2.4" height="0.6" fill="#dbeafe"/><rect x="69.2" y="153.6" width="2.4" height="0.4" fill="#dbeafe"/><rect x="74.1" y="153.9" width="2.4" height="0.1" fill="#dbeafe"/><rect x="79.0" y="153.7" width="2.4" height="0.3" fill="#dbeafe"/><rect x="83.9" y="152.7" width="2.4" height="1.3" fill="#dbeafe"/><rect x="88.8" y="153.0" width="2.4" height="1.0" fill="#dbeafe"/><rect x="93.7" y="153.9" width="2.4" height="0.1" fill="#dbeafe"/><rect x="98.6" y="151.3" width="2.4" height="2.7" fill="#dbeafe"/><rect x="103.5" y="153.8" width="2.4" height="0.2" fill="#dbeafe"/><rect x="108.4" y="153.3" width="2.4" height="0.7" fill="#dbeafe"/><rect x="113.3" y="153.3" width="2.4" height="0.7" fill="#dbeafe"/><rect x="118.1" y="153.3" width="2.4" height="0.7" fill="#dbeafe"/><rect x="123.0" y="153.3" width="2.4" height="0.7" fill="#dbeafe"/><rect x="127.9" y="152.3" width="2.4" height="1.7" fill="#dbeafe"/><rect x="132.8" y="153.4" width="2.4" height="0.6" fill="#dbeafe"/><rect x="137.7" y="152.8" width="2.4" height="1.2" fill="#dbeafe"/><rect x="142.6" y="152.3" width="2.4" height="1.7" fill="#dbeafe"/><rect x="147.5" y="153.5" width="2.4" height="0.5" fill="#dbeafe"/><rect x="152.4" y="153.1" width="2.4" height="0.9" fill="#dbeafe"/><rect x="157.3" y="153.4" width="2.4" height="0.6" fill="#dbeafe"/><rect x="162.2" y="153.6" width="2.4" height="0.4" fill="#dbeafe"/><rect x="167.1" y="153.1" width="2.4" height="0.9" fill="#dbeafe"/><rect x="171.9" y="153.0" width="2.4" height="1.0" fill="#dbeafe"/><rect x="176.8" y="152.0" width="2.4" height="2.0" fill="#dbeafe"/><rect x="181.7" y="153.3" width="2.4" height="0.7" fill="#dbeafe"/><rect x="186.6" y="152.8" width="2.4" height="1.2" fill="#dbeafe"/><rect x="191.5" y="153.2" width="2.4" height="0.8" fill="#dbeafe"/><rect x="196.4" y="153.0" width="2.4" height="1.0" fill="#dbeafe"/><rect x="201.3" y="151.8" width="2.4" height="2.2" fill="#dbeafe"/><rect x="206.2" y="149.5" width="2.4" height="4.5" fill="#dbeafe"/><rect x="211.1" y="152.3" width="2.4" height="1.7" fill="#dbeafe"/><rect x="216.0" y="151.0" width="2.4" height="3.0" fill="#dbeafe"/><rect x="220.9" y="147.3" width="2.4" height="6.7" fill="#dbeafe"/><rect x="225.7" y="151.8" width="2.4" height="2.2" fill="#dbeafe"/><rect x="230.6" y="152.2" width="2.4" height="1.8" fill="#dbeafe"/><rect x="235.5" y="151.5" width="2.4" height="2.5" fill="#dbeafe"/><rect x="240.4" y="153.2" width="2.4" height="0.8" fill="#dbeafe"/><rect x="245.3" y="148.9" width="2.4" height="5.1" fill="#dbeafe"/><rect x="250.2" y="140.6" width="2.4" height="13.4" fill="#dbeafe"/><rect x="255.1" y="148.5" width="2.4" height="5.5" fill="#dbeafe"/><rect x="260.0" y="145.7" width="2.4" height="8.3" fill="#dbeafe"/><rect x="264.9" y="147.4" width="2.4" height="6.6" fill="#dbeafe"/><rect x="269.8" y="138.1" width="2.4" height="15.9" fill="#dbeafe"/><rect x="274.7" y="143.9" width="2.4" height="10.1" fill="#dbeafe"/><rect x="279.5" y="151.1" width="2.4" height="2.9" fill="#dbeafe"/><rect x="284.4" y="150.0" width="2.4" height="4.0" fill="#dbeafe"/><rect x="289.3" y="151.3" width="2.4" height="2.7" fill="#dbeafe"/><rect x="294.2" y="152.1" width="2.4" height="1.9" fill="#dbeafe"/><rect x="299.1" y="149.3" width="2.4" height="4.7" fill="#dbeafe"/><rect x="304.0" y="150.1" width="2.4" height="3.9" fill="#dbeafe"/><rect x="308.9" y="147.8" width="2.4" height="6.2" fill="#dbeafe"/><rect x="313.8" y="151.4" width="2.4" height="2.6" fill="#dbeafe"/><rect x="318.7" y="148.6" width="2.4" height="5.4" fill="#dbeafe"/><rect x="323.6" y="147.2" width="2.4" height="6.8" fill="#dbeafe"/><rect x="328.5" y="134.9" width="2.4" height="19.1" fill="#dbeafe"/><rect x="333.3" y="143.1" width="2.4" height="10.9" fill="#dbeafe"/><rect x="338.2" y="138.5" width="2.4" height="15.5" fill="#dbeafe"/><rect x="343.1" y="144.3" width="2.4" height="9.7" fill="#dbeafe"/><rect x="348.0" y="145.7" width="2.4" height="8.3" fill="#dbeafe"/><rect x="352.9" y="147.6" width="2.4" height="6.4" fill="#dbeafe"/><rect x="357.8" y="144.6" width="2.4" height="9.4" fill="#dbeafe"/><rect x="362.7" y="148.1" width="2.4" height="5.9" fill="#dbeafe"/><rect x="367.6" y="148.4" width="2.4" height="5.6" fill="#dbeafe"/><rect x="372.5" y="148.0" width="2.4" height="6.0" fill="#dbeafe"/><rect x="377.4" y="148.7" width="2.4" height="5.3" fill="#dbeafe"/><rect x="382.2" y="150.3" width="2.4" height="3.7" fill="#dbeafe"/><rect x="387.1" y="145.2" width="2.4" height="8.8" fill="#dbeafe"/><rect x="392.0" y="137.2" width="2.4" height="16.8" fill="#dbeafe"/><rect x="396.9" y="148.2" width="2.4" height="5.8" fill="#dbeafe"/><rect x="401.8" y="147.9" width="2.4" height="6.1" fill="#dbeafe"/><rect x="406.7" y="144.5" width="2.4" height="9.5" fill="#dbeafe"/><rect x="411.6" y="149.1" width="2.4" height="4.9" fill="#dbeafe"/><rect x="416.5" y="146.6" width="2.4" height="7.4" fill="#dbeafe"/><rect x="421.4" y="143.0" width="2.4" height="11.0" fill="#dbeafe"/><rect x="426.3" y="147.0" width="2.4" height="7.0" fill="#dbeafe"/><rect x="431.2" y="143.9" width="2.4" height="10.1" fill="#dbeafe"/><rect x="436.0" y="143.8" width="2.4" height="10.2" fill="#dbeafe"/><rect x="440.9" y="145.6" width="2.4" height="8.4" fill="#dbeafe"/><rect x="445.8" y="148.6" width="2.4" height="5.4" fill="#dbeafe"/><rect x="450.7" y="143.8" width="2.4" height="10.2" fill="#dbeafe"/><rect x="455.6" y="142.3" width="2.4" height="11.7" fill="#dbeafe"/><rect x="460.5" y="137.1" width="2.4" height="16.9" fill="#dbeafe"/><rect x="465.4" y="139.9" width="2.4" height="14.1" fill="#dbeafe"/><rect x="470.3" y="142.1" width="2.4" height="11.9" fill="#dbeafe"/><rect x="475.2" y="147.3" width="2.4" height="6.7" fill="#dbeafe"/><rect x="480.1" y="141.4" width="2.4" height="12.6" fill="#dbeafe"/><rect x="485.0" y="144.9" width="2.4" height="9.1" fill="#dbeafe"/><rect x="489.8" y="128.1" width="2.4" height="25.9" fill="#dbeafe"/><rect x="494.7" y="139.9" width="2.4" height="14.1" fill="#dbeafe"/><rect x="499.6" y="101.4" width="2.4" height="52.6" fill="#dbeafe"/><rect x="504.5" y="88.1" width="2.4" height="65.9" fill="#dbeafe"/><rect x="509.4" y="98.0" width="2.4" height="56.0" fill="#dbeafe"/><rect x="514.3" y="95.8" width="2.4" height="58.2" fill="#dbeafe"/><rect x="519.2" y="125.2" width="2.4" height="28.8" fill="#dbeafe"/><rect x="524.1" y="133.1" width="2.4" height="20.9" fill="#dbeafe"/><rect x="529.0" y="128.5" width="2.4" height="25.5" fill="#dbeafe"/><rect x="533.9" y="114.9" width="2.4" height="39.1" fill="#dbeafe"/><rect x="538.8" y="103.5" width="2.4" height="50.5" fill="#dbeafe"/><rect x="543.6" y="126.5" width="2.4" height="27.5" fill="#dbeafe"/><rect x="548.5" y="128.2" width="2.4" height="25.8" fill="#dbeafe"/><rect x="553.4" y="129.7" width="2.4" height="24.3" fill="#dbeafe"/><rect x="558.3" y="78.8" width="2.4" height="75.2" fill="#dbeafe"/><rect x="563.2" y="104.3" width="2.4" height="49.7" fill="#dbeafe"/><rect x="568.1" y="118.6" width="2.4" height="35.4" fill="#dbeafe"/><rect x="573.0" y="130.5" width="2.4" height="23.5" fill="#dbeafe"/><rect x="577.9" y="124.5" width="2.4" height="29.5" fill="#dbeafe"/><rect x="582.8" y="132.6" width="2.4" height="21.4" fill="#dbeafe"/><rect x="587.7" y="130.9" width="2.4" height="23.1" fill="#dbeafe"/><rect x="592.6" y="128.7" width="2.4" height="25.3" fill="#dbeafe"/><rect x="597.4" y="135.2" width="2.4" height="18.8" fill="#dbeafe"/><rect x="602.3" y="117.3" width="2.4" height="36.7" fill="#dbeafe"/><rect x="607.2" y="128.5" width="2.4" height="25.5" fill="#dbeafe"/><rect x="612.1" y="136.1" width="2.4" height="17.9" fill="#dbeafe"/><rect x="617.0" y="141.8" width="2.4" height="12.2" fill="#dbeafe"/><rect x="621.9" y="135.4" width="2.4" height="18.6" fill="#dbeafe"/><rect x="626.8" y="135.8" width="2.4" height="18.2" fill="#dbeafe"/><polyline points="46.0,145.9 50.9,145.8 55.8,145.8 60.7,145.8 65.6,145.8 70.5,145.8 75.3,145.8 80.2,145.7 85.1,144.9 90.0,145.3 94.9,145.3 99.8,144.6 104.7,144.4 109.6,144.0 114.5,143.9 119.4,144.2 124.3,144.4 129.1,144.3 134.0,144.0 138.9,143.8 143.8,143.8 148.7,143.5 153.6,142.8 158.5,142.6 163.4,142.4 168.3,141.8 173.2,141.3 178.1,141.2 182.9,141.1 187.8,141.2 192.7,141.5 197.6,141.3 202.5,139.9 207.4,137.3 212.3,136.6 217.2,136.7 222.1,133.7 227.0,133.3 231.8,133.4 236.7,133.4 241.6,133.4 246.5,131.6 251.4,127.5 256.3,125.3 261.2,123.0 266.1,119.7 271.0,115.3 275.9,115.7 280.8,116.2 285.6,117.0 290.5,117.2 295.4,117.2 300.3,115.9 305.2,115.9 310.1,117.6 315.0,118.1 319.9,116.4 324.8,112.7 329.7,105.3 334.6,99.7 339.4,92.5 344.3,91.3 349.2,90.2 354.1,90.0 359.0,94.4 363.9,96.3 368.8,98.5 373.7,99.8 378.6,98.2 383.5,96.4 388.4,95.8 393.2,96.3 398.1,99.1 403.0,100.9 407.9,101.3 412.8,102.4 417.7,104.5 422.6,106.6 427.5,107.1 432.4,105.1 437.3,103.6 442.2,102.3 447.0,101.3 451.9,100.3 456.8,98.6 461.7,97.2 466.6,90.2 471.5,84.8 476.4,83.0 481.3,79.2 486.2,79.1 491.1,72.7 495.9,67.5 500.8,34.2 505.7,21.9 510.6,35.0 515.5,44.3 520.4,47.9 525.3,49.9 530.2,53.5 535.1,55.2 540.0,62.9 544.9,63.8 549.7,65.6 554.6,65.9 559.5,39.6 564.4,32.7 569.3,31.3 574.2,31.0 579.1,30.0 584.0,32.5 588.9,33.5 593.8,35.0 598.7,34.5 603.5,33.4 608.4,31.3 613.3,34.2 618.2,36.3 623.1,35.9 628.0,39.0" fill="none" stroke="#16a34a" stroke-width="1.4"/></svg>
+  </div>
+
+  <div class="card">
+    <div class="card-title">全部合约</div>
+    <div class="card-note"><a href="/futures/">返回期货行情列表</a></div>
+  </div>
+</div>
+
+  
+<div class="footer">
+  纸浆 AI 投研工作台 V0.1 · 公开审阅站（Public Review Site）· 数据来源：Wind 终端 / Wind Excel 插件 + SHFE 官方历史数据 ·
+  数据截至 2026-09-16（静态快照生成于 2026-09-17，非实时）· 本页为预渲染静态快照，供外部审阅抓取，不提供真实 AI 调用与登录功能。
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index,follow">
+<title>最近一次真实 AI 报告 · 纸浆 AI 投研工作台（公开审阅站）</title>
+<style>
+:root {
+  --bg:#f5f6f8; --card:#ffffff; --border:#e5e8ec; --text:#1a1f26; --muted:#6b7480;
+  --accent:#2563eb; --accent-soft:#eef3ff;
+  --up:#dc2626; --down:#16a34a; --warn:#d97706; --risk:#b45309;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.app{max-width:1120px;margin:0 auto;padding:0 20px 80px}
+
+/* 顶部 */
+.topbar{background:#0f172a;color:#fff;padding:0 20px;position:sticky;top:0;z-index:10;box-shadow:0 1px 8px rgba(0,0,0,.12)}
+.topbar-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;height:56px;gap:28px}
+.brand{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.brand .logo{width:22px;height:22px;border-radius:5px;background:linear-gradient(135deg,#2563eb,#16a34a);display:inline-block}
+.nav{display:flex;gap:4px;height:100%}
+.nav button{background:none;border:none;color:#cbd5e1;font-size:14px;padding:0 16px;height:100%;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;font-family:inherit}
+.nav button:hover{color:#fff}
+.nav button.active{color:#fff;border-bottom-color:#3b82f6;font-weight:600}
+
+/* 页面 */
+.page{display:none;padding-top:24px}
+.page.active{display:block}
+.page-head{margin-bottom:18px}
+.page-head h2{font-size:20px;margin:0 0 4px}
+.page-sub{color:var(--muted);font-size:13px}
+.page-sub strong{color:var(--text)}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:12px}
+.card-note{color:var(--muted);font-size:12px;margin-top:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid-2{grid-template-columns:1fr}}
+
+/* 英雄区 */
+.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:var(--radius);padding:22px 24px;margin-bottom:16px}
+.hero-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.hero-title{font-size:15px;font-weight:600;color:#dbeafe}
+.hero-code{font-size:22px;font-weight:700;color:#fff;margin-left:6px}
+.hero-date{font-size:12px;color:#bfdbfe}
+.hero-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+@media(max-width:860px){.hero-grid{grid-template-columns:repeat(3,1fr)}}
+.hero .mc{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 12px}
+.hero .mc-k{font-size:11px;color:#bfdbfe}
+.hero .mc-v{font-size:20px;font-weight:700;color:#fff}
+
+/* 指标卡 */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
+.mc{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.mc-k{font-size:11px;color:var(--muted)}
+.mc-v{font-size:17px;font-weight:700;margin-top:2px}
+.mc-sub{font-size:11px;color:var(--muted)}
+
+/* 值得关注 */
+.hl-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:#fffdf7}
+.hl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hl-cat{font-size:12px;color:var(--muted);font-weight:600}
+.hl-title{font-size:13px;font-weight:600}
+.hl-detail{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* 药丸 */
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;font-weight:600}
+.sev-warn{background:#fef3c7;color:#92400e}
+.sev-risk{background:#fee2e2;color:#991b1b}
+.sev-ok{background:#dcfce7;color:#166534}
+.pill-main{background:#dbeafe;color:#1e40af}
+.pill-second{background:#e0e7ff;color:#3730a3}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:#fafbfc;color:var(--muted);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.stale{color:var(--warn);font-weight:600}
+.ok{color:var(--down);font-weight:600}
+
+/* 图表 */
+.chart-title{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 8px}
+.legend{display:flex;gap:16px;margin:4px 0 8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend .lg{display:inline-flex;align-items:center;gap:5px}
+.legend .sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.empty{color:var(--muted);font-style:italic;font-size:13px;padding:10px 0}
+
+/* 合约选择 */
+.cc-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.cc-btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+.cc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cc-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+
+/* AI */
+.ai-intro p{font-size:13px;color:var(--muted)}
+.ai-warn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;font-size:13px;color:#92400e;margin:12px 0}
+.ai-actions{display:flex;align-items:center;gap:16px;margin-top:8px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-primary:hover{background:#1d4ed8}
+.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-secondary:hover{background:var(--accent-soft)}
+.ai-hint{font-size:12px;color:var(--muted)}
+.ai-asof{font-size:12px;color:var(--muted);font-weight:400}
+
+.ai-report{font-size:14px}
+.ai-section{margin:14px 0}
+.ai-section h4{margin:0 0 6px;font-size:14px;color:var(--text)}
+.ai-section .body{font-size:13.5px}
+.ai-badge{display:inline-block;font-size:13px;font-weight:700;padding:3px 14px;border-radius:6px;margin-bottom:10px}
+.ai-badge.bull{background:#fee2e2;color:#b91c1c}
+.ai-badge.bear{background:#dcfce7;color:#15803d}
+.ai-badge.neutral{background:#e5e7eb;color:#374151}
+.ai-badge.insufficient{background:#fef3c7;color:#92400e}
+
+.ai-followup{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.ai-follow-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ai-follow-btns button{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--text)}
+.ai-follow-btns button:hover{border-color:var(--accent);color:var(--accent)}
+.ai-input-row{display:flex;gap:10px;margin-top:10px}
+.ai-input-row input{flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;font-family:inherit}
+.ai-input-row input:focus{outline:none;border-color:var(--accent)}
+#ai-follow-result{margin-top:14px;font-size:13.5px;background:var(--bg);border-radius:8px;padding:14px}
+.ai-follow-note{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.ai-follow-note strong{color:var(--text)}
+.ai-follow-tip{color:#1e40af}
+.streaming{white-space:pre-wrap;word-break:break-word;font-size:13.5px;color:var(--text);min-height:20px}
+.streaming::after{content:'▍';color:var(--accent);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.q-item{margin-bottom:10px;padding:10px 12px;background:#eef3ff;border-radius:8px;font-size:13px}
+.a-item{font-size:13.5px;line-height:1.7}
+.a-item p{margin:6px 0}
+.a-item ul{margin:6px 0;padding-left:20px}
+
+/* 资讯 */
+.news-list{margin-top:4px}
+.news-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.news-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.news-time{font-size:12px;color:var(--muted);font-weight:600}
+.news-src{font-size:11px;color:var(--muted)}
+.news-title{font-size:13.5px;font-weight:600;margin-bottom:4px}
+.news-title a{color:var(--text);text-decoration:none}
+.news-title a:hover{color:var(--accent)}
+.news-summary{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.news-rel{font-size:12px;color:#92400e;background:#fffbeb;border-radius:6px;padding:6px 10px;margin-top:6px}
+
+/* 重要度药丸 */
+.imp-high{background:#fee2e2;color:#b91c1c}
+.imp-mid{background:#fef3c7;color:#92400e}
+.imp-low{background:#e5e7eb;color:#374151}
+
+/* 事件表 */
+.ev-impact{font-size:12px;color:var(--muted);max-width:260px}
+
+/* 报告样式 */
+.rep-h2{font-size:17px;margin:16px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.rep-h3{font-size:15px;margin:16px 0 8px;color:var(--text)}
+.rep-h4{font-size:13.5px;margin:12px 0 6px;color:var(--muted)}
+.rep-p{font-size:13.5px;margin:6px 0;line-height:1.7}
+.rep-ul{margin:6px 0;padding-left:20px;font-size:13.5px;line-height:1.7}
+.rep-quote{background:var(--bg);border-left:3px solid var(--accent);padding:8px 14px;margin:10px 0;color:var(--muted);font-size:12.5px;border-radius:0 6px 6px 0}
+.rep-hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* 历史分析 */
+.hist-item{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;cursor:pointer}
+.hist-head{display:flex;gap:16px;padding:10px 14px;background:#fafbfc;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.hist-head span:first-child{font-weight:600;color:var(--text)}
+.hist-body{padding:14px;border-top:1px solid var(--border)}
+
+.footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
+
+/* 顶栏登录区 */
+.auth-zone{margin-left:auto;display:flex;align-items:center;gap:10px}
+.auth-user{color:#cbd5e1;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-btn{background:none;border:1px solid #475569;color:#e2e8f0;border-radius:6px;padding:5px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+.auth-btn:hover{border-color:#94a3b8;color:#fff}
+.auth-btn.primary{background:#2563eb;border-color:#2563eb;color:#fff}
+
+/* AI 登录门控卡片 */
+.ai-gate p{font-size:13px;color:var(--muted)}
+
+/* 登录/注册弹层 */
+.auth-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center}
+.auth-modal-mask{position:absolute;inset:0;background:rgba(15,23,42,.5)}
+.auth-dialog{position:relative;background:#fff;border-radius:12px;width:380px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden}
+.auth-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.auth-title{font-size:16px;font-weight:700}
+.auth-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border)}
+.auth-tab{flex:1;background:none;border:none;padding:12px;font-size:14px;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:2px solid transparent}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.auth-body{padding:18px 20px 20px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.auth-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;box-sizing:border-box}
+.auth-field input:focus{outline:none;border-color:var(--accent)}
+.auth-otp-row{display:flex;gap:8px}
+.auth-otp-row input{flex:1}
+.auth-otp-row button{white-space:nowrap;padding:10px 12px}
+.auth-error{background:#fee2e2;color:#991b1b;border-radius:6px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.auth-submit{width:100%;margin-top:4px}
+.auth-links{display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px}
+.auth-links a{color:var(--accent);text-decoration:none;cursor:pointer}
+.auth-links a:hover{text-decoration:underline}
+
+/* Review Site 覆盖：页面直接显示，不靠 JS 切换 */
+.page{display:block !important;padding-top:24px}
+/* Review 导航：纯 <a> 链接，无需 JS */
+.review-nav{display:flex;gap:4px;height:100%}
+.review-nav a{color:#cbd5e1;font-size:14px;padding:0 16px;height:100%;display:flex;align-items:center;text-decoration:none;border-bottom:2px solid transparent;transition:.15s}
+.review-nav a:hover{color:#fff}
+.review-nav a.active{color:#fff;border-bottom-color:#3b82f6;font-weight:600}
+.review-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#92400e;margin-bottom:16px}
+.review-banner a{color:#92400e;font-weight:600}
+.review-breadcrumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.review-breadcrumb a{color:var(--accent);text-decoration:none}
+.review-breadcrumb a:hover{text-decoration:underline}
+.conv-msg{margin-bottom:12px}
+.conv-q{padding:10px 14px;background:#eef3ff;border-radius:8px;font-size:13.5px;font-weight:600}
+.conv-a{margin-top:6px;padding:12px 14px;background:#fafbfc;border:1px solid var(--border);border-radius:8px;font-size:13.5px;line-height:1.7}
+.conv-a p{margin:6px 0}
+.conv-a ul{margin:6px 0;padding-left:20px}
+.conv-meta{font-size:11.5px;color:var(--muted);margin-top:4px}
+.sample-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sample-meta .sm{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted)}
+.sample-meta .sm strong{color:var(--text)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="logo"></span>纸浆 AI 投研工作台 · 公开审阅站</div>
+    <div class="review-nav">
+      <a href="/">纸浆市场看板</a>
+      <a href="/futures/">期货行情</a>
+      <a href="/ai/" class="active">AI 品种分析</a>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  
+<div class="review-banner">
+  这是<strong>公开审阅站</strong>（供外部工具抓取审阅用），非正式产品入口。正式站见
+  <a href="https://pulp-trader-copilot.app.workbuddy.host/" target="_blank" rel="noopener">pulp-trader-copilot.app.workbuddy.host</a>。
+  本页所有内容已预渲染到 HTML，无需执行 JavaScript 即可阅读；数据截至 2026-09-16。
+</div>
+
+  <div class="review-breadcrumb"><a href="/ai/">AI 品种分析</a> / 最近一次真实报告</div>
+  
+<div class="page" id="page-ai-sample">
+  <div class="page-head">
+    <h2>最近一次真实 AI 分析报告</h2>
+    <div class="page-sub">由 WorkBuddy AI 真实生成 · 数据截至 <strong>2026-09-16</strong></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">报告元信息</div>
+    <div class="sample-meta"><div class="sm"><strong>生成时间</strong> 2026-09-20 22:23（UTC+8）</div><div class="sm"><strong>数据截至</strong> 2026-09-16</div><div class="sm"><strong>快照标识</strong> 纸浆 AI 投研工作台 V0.1 · 数据截至 2026-09-16</div><div class="sm"><strong>资讯版本</strong> 2026-09-18 17:15 / 2026-09-18 17:15</div></div>
+    <div class="card-note">本报告为正式站一次真实「生成分析」产出的模型输出，已固化到静态快照，供审阅。不构成投资建议。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">分析报告全文</div>
+    <div class="ai-report"><h2 class='rep-h2'>纸浆（SHFE SP）AI 品种分析</h2>
+<blockquote class='rep-quote'>数据截至：2026-09-16（静态快照）｜生成时间：2026-09-18 17:15｜分析角色：盘面结构 / 资金持仓 / 产业库存 / 宏观事件 四视角 + 综合研究</blockquote>
+<blockquote class='rep-quote'>研究边界：当前研究阶段（P3）结论为「已验证交易信号 = 0」。本报告为基于当前数据与公开资讯的<strong>研究判断</strong>，非量化验证后的交易信号，不构成买卖建议。</blockquote>
+<hr/>
+<h3 class='rep-h3'>综合倾向：偏强（基于当前数据与信息的研究判断，非信号）</h3>
+<p class='rep-p'><strong>判定依据（证据加权，非 Alpha）</strong>：外盘浆厂集中提价（成本支撑）+ 港口库存连续去化（库存改善）+ 海外供应扰动（印尼林火、加拿大关停）共同指向偏强；但下游需求兑现偏弱、机构持仓净空、远月溢价偏高形成压制，故仅判「偏强」而非「强」。</p>
+<hr/>
+<h3 class='rep-h3'>一、今日盘面概览</h3>
+<ul class='rep-ul'>
+<li>主力合约 <strong>SP2611.SHF</strong> 收盘 <strong>4,822 元/吨</strong>，较前一交易日<strong>上涨 54 元/吨（+1.13%）</strong>，涨红。</li>
+<li>成交量 344,719 手，持仓量 208,004 手。</li>
+<li>前一交易日（2026-09-15）收盘 4,768，本日放量上攻，量价配合尚可。</li>
+</ul>
+<h3 class='rep-h3'>二、期限结构</h3>
+<ul class='rep-ul'>
+<li>曲线斜率 β₁ = 17.0（z60 = −0.56），处于<strong>历史常态区间</strong>，未显著偏陡或偏平。</li>
+<li>曲率 C = −10.0（z60 = +0.19），同样处于常态区间。</li>
+<li><strong>主力-次主力价差 174 点</strong>（SP2611→SP2701，结算价口径、数据截至 2026-09-16）。该价差跨越 2 个交割月（中间为低持仓 SP2612），内含 SP2612→SP2701 的跨年跳升 162 点，故绝对值天然大于单月相邻价差（如 SP2611→SP2612 仅 12 点），属期限结构正常特征，不应简单视作「异常」。</li>
+</ul>
+<h3 class='rep-h3'>三、成交与持仓</h3>
+<ul class='rep-ul'>
+<li>持仓排名：SP2611（208,004，主力）> SP2701（130,905，次主力）> SP2703（42,371）。</li>
+<li><strong>主力 OI 集中度 52.2%，次主力 32.9%</strong>；次主力持仓已达主力的 <strong>63%</strong>，处于<strong>持仓迁移进行中</strong>的状态。</li>
+<li>量仓迁移显示主力 OI 自 8 月下旬以来逐步下降、次主力 OI 逐步上升，属<strong>常规换月前奏</strong>，但当前尚未触发正式主力切换（pending selection 仍为 SP2611）。</li>
+</ul>
+<h3 class='rep-h3'>四、仓单与库存</h3>
+<ul class='rep-ul'>
+<li>仓单总量 438,316 吨，单日 +983 吨。</li>
+<li>SHFE 周度库存 434,204 吨（期货量 432,791 吨，可用库容 837,209 吨）。</li>
+<li>交易所口径仓单/库存仍处相对高位，与「港口库存去化」需区分：<strong>交易所库存是期货交割口径，港口库存是社会流通口径</strong>，二者不可混用。</li>
+</ul>
+<h3 class='rep-h3'>五、重要资讯与事件</h3>
+<p class='rep-p'><strong>偏多线索（供应/成本端）</strong>：</p>
+<ul class='rep-ul'>
+<li>Arauco 9 月阔叶浆外盘 +20 美元、针叶浆持平；Suzano 自 4 月以来首次亚洲提价 20 美元——外盘挺价抬升进口成本。</li>
+<li>印尼林火收窄阔叶浆供应预期；加拿大 Domtar 关停 + 海外浆厂集中停机，全球发运中国量同比下滑。</li>
+<li>港口样本库存降至 215.28 万吨，环比 −1.31%，连续去化。</li>
+</ul>
+<p class='rep-p'><strong>偏空/制约线索（需求端）</strong>：</p>
+<ul class='rep-ul'>
+<li>下游「金九」旺季兑现偏弱：双胶纸 47.77% 开工虽环比 +2.94pct 但仍处低位，纸厂高价接受有限。</li>
+<li>信达期货：主力前 20 名净空 31,492 手，短期震荡偏弱；上涨以预期驱动为主，现实需求未兑现。</li>
+</ul>
+<p class='rep-p'><strong>未来关注（宏观/交割）</strong>：</p>
+<ul class='rep-ul'>
+<li>9/18 日本央行、9/21 中国 LPR、9/30 中国官方 PMI + 美国 PCE。</li>
+<li>SHFE 交割：SP2610 自然人持仓 10/08 归零、10/15 最后交易日。</li>
+</ul>
+<h3 class='rep-h3'>六、支持偏强 / 偏弱的证据</h3>
+<p class='rep-p'><strong>支持偏强</strong>：</p>
+<p class='rep-p'>1. 外盘浆厂集中提价，进口成本支撑偏强；</p>
+<p class='rep-p'>2. 港口库存连续去化，基本面边际改善；</p>
+<p class='rep-p'>3. 海外供应扰动（林火、关停、停机）强化供应收缩预期。</p>
+<p class='rep-p'><strong>支持偏弱</strong>：</p>
+<p class='rep-p'>1. 下游需求兑现偏弱，「预期强、现实弱」；</p>
+<p class='rep-p'>2. 主力-次主力价差 174 点（跨 2 个交割月、含跨年跳升），远月溢价偏高，存在结构回归压力；</p>
+<p class='rep-p'>3. 机构持仓净空、高位获利回吐风险；</p>
+<p class='rep-p'>4. 交易所仓单/库存仍处高位，供给宽松格局未根本扭转。</p>
+<h3 class='rep-h3'>七、当前主要矛盾</h3>
+<p class='rep-p'><strong>「供应收缩预期」与「现实需求偏弱」的拉锯</strong>。外盘提价与海外停机撑起成本与情绪，但下游纸厂开工与利润仍在低位，高价接受有限，尚未形成持续补库。主力-次主力价差跨越 2 个交割月、远月溢价偏高，也提示跨月定价存在张力。</p>
+<h3 class='rep-h3'>八、风险提示</h3>
+<p class='rep-p'>1. <strong>结构回归风险</strong>：主力-次主力价差 174 点（跨 2 个交割月），若资金平仓或换月推进，价差可能快速收敛，引发近月价格波动。</p>
+<p class='rep-p'>2. <strong>换月机械风险</strong>：次主力持仓已逼近主力 63%，且期限结构窗口已发生换腿（curve transition），曲线形态前后不可直接跨点比较。</p>
+<p class='rep-p'>3. <strong>高位回吐风险</strong>：本轮上涨以预期驱动为主，若宏观（日本央行/美联储政策、美元）或需求数据不及预期，存在阶段性回调。</p>
+<p class='rep-p'>4. <strong>口径风险</strong>：交易所仓单/库存 ≠ 港口/社会库存，分析时需严格区分口径。</p>
+<h3 class='rep-h3'>九、后续重点关注</h3>
+<p class='rep-p'>1. 主力-次主力价差（174 点）能否收敛，及换月进程（SP2611 → SP2701）；</p>
+<p class='rep-p'>2. 港口库存是否延续去化、下游纸厂开工与利润改善；</p>
+<p class='rep-p'>3. 外盘提价能否向下游传导（纸价是否跟涨）；</p>
+<p class='rep-p'>4. 9/21 LPR、9/30 PMI/PCE 等宏观数据的边际影响。</p>
+<hr/>
+<h4 class='rep-h4'>数据事实 / 新闻事实 / AI 推断 的区分</h4>
+<ul class='rep-ul'>
+<li><strong>数据事实</strong>：主力行情、期限结构、持仓、仓单库存等，均来自仓库已冻结的 P2/P3 数据资产。</li>
+<li><strong>新闻/事件事实</strong>：外盘提价、港口库存、海外停机、宏观事件日历等，来自公开渠道检索（见资讯来源标注）。</li>
+<li><strong>AI 推断</strong>：「综合倾向偏强」「主要矛盾」「风险提示」等，属于基于上述数据与资讯的<strong>研究判断</strong>，非量化验证结论。</li>
+</ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">所用数据上下文（摘要）</div>
+    <div class="card-note">本报告基于以下研究上下文生成（完整 JSON 见正式站 ai-context）：主力合约 SP2611.SHF、主力-次主力价差 174 点、期限结构斜率/曲率、持仓排名与迁移、仓单 438,316 吨、SHFE 库存 434,204 吨、重要资讯 8 条、宏观事件 8 条。</div>
+    <ul class="rep-ul">
+      <li>主力合约：SP2611.SHF（交割月 2026-11）</li>
+      <li>主力-次主力价差：174 点（SP2611→SP2701，跨 2 个交割月）</li>
+      <li>次主力持仓已达主力 63%（持仓迁移进行中）</li>
+      <li>仓单 438,316 吨（+983），SHFE 库存 434,204 吨</li>
+      <li>重要资讯 8 条（外盘提价、印尼林火、加拿大关停、港口库存去化等）</li>
+      <li>宏观事件 8 条（BoJ、LPR、四巫日、PMI/PCE、SHFE 交割等）</li>
+    </ul>
+  </div>
+</div>
+
+  
+<div class="footer">
+  纸浆 AI 投研工作台 V0.1 · 公开审阅站（Public Review Site）· 数据来源：Wind 终端 / Wind Excel 插件 + SHFE 官方历史数据 ·
+  数据截至 2026-09-16（静态快照生成于 2026-09-17，非实时）· 本页为预渲染静态快照，供外部审阅抓取，不提供真实 AI 调用与登录功能。
+</div>
+
+</div>
+</body>
+</html>
